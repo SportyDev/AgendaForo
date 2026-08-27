@@ -1,24 +1,27 @@
 <?php
 
 use App\Http\Controllers\Admin\UsuarioController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+// Rutas generadas por Breeze para el Dashboard base
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified', 'active'])->name('dashboard');
+
 // -- Panel de Administración --
-Route::middleware(['auth', 'active', 'role:admin'])->prefix('admin')->group(function () {
-    // Aquí irán las rutas del administrador
-    Route::post('/usuarios', [UsuarioController::class, 'store'])->name('admin.usuarios.store');
+Route::middleware(['auth', 'active', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::post('/usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
 });
 
-// -- Panel de Solicitante --
-Route::middleware(['auth', 'active'])->group(function () {
-    // Aquí irán las rutas de solicitantes
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php'; // En caso de usar Breeze/Jetstream/Laravel UI
+require __DIR__ . '/auth.php';
