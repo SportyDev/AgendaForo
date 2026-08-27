@@ -1,22 +1,16 @@
 <?php
 
-use App\Http\Controllers\Admin\UsuarioController;
+use App\Http\Controllers\InicioController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('inicio.index');
 });
 
-// Rutas generadas por Breeze para el Dashboard base
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified', 'active'])->name('dashboard');
-
-// -- Panel de Administración --
-Route::middleware(['auth', 'active', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::post('/usuarios', [UsuarioController::class, 'store'])->name('usuarios.store');
-});
+Route::get('/inicio', [InicioController::class, 'index'])
+    ->middleware(['auth', 'active'])
+    ->name('inicio.index');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
