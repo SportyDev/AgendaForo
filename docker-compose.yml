@@ -1,0 +1,62 @@
+services:
+  app:
+    image: bitnami/laravel:latest
+    container_name: reservas_app
+    restart: unless-stopped
+    ports:
+      - "8004:8004"
+    volumes:
+      - ./:/app
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=reservas
+      - DB_USERNAME=root
+      - DB_PASSWORD=Reservas2026
+      - TZ=America/Mexico_City
+      - BITNAMI_DEBUG=true
+      - LARAVEL_SKIP_DATABASE_CHECK=yes
+    depends_on:
+      - db
+    command: php artisan serve --host=0.0.0.0 --port=8004
+
+  db:
+    image: mysql:8.0
+    container_name: reservas_db
+    restart: unless-stopped
+    ports:
+      - "3309:3306"
+    environment:
+      MYSQL_DATABASE: reservas
+      MYSQL_ROOT_PASSWORD: Reservas2026
+    volumes:
+      - reservas_mysql_data:/var/lib/mysql
+
+  node:
+      image: node:22
+      container_name: reservas_vite
+      restart: unless-stopped
+      user: "1000:1000"
+      working_dir: /app
+      volumes:
+        - ./:/app
+      ports:
+        - "5176:5176"
+      command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port 5176"
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: reservas_phpmyadmin
+    restart: always
+    ports:
+      - "8085:80"
+    environment:
+      - PMA_HOST=db
+      - PMA_USER=root
+      - PMA_PASSWORD=Reservas2026
+    depends_on:
+      - db
+
+volumes:
+  reservas_mysql_data:
