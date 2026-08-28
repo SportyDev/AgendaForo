@@ -382,7 +382,7 @@
 
                         <!-- Gestión de Usuarios -->
                         <a
-                            href="#"
+                            href="{{ route('admin.usuarios.index') }}"
                             class="sidebar-link group flex items-center center-on-collapse gap-4 rounded-xl px-4 py-3 text-[15px] transition-all
                             {{ request()->routeIs('admin.usuarios.*')
                                 ? 'is-active bg-active-bg text-active-text font-bold shadow-sm'

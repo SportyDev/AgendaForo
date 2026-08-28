@@ -1,30 +1,49 @@
 <?php
 
+use App\Http\Controllers\Admin\CalendarioController;
+use App\Http\Controllers\Admin\SolicitudController;
+use App\Http\Controllers\Admin\UsuarioController;
 use App\Http\Controllers\InicioController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Solicitante\ReservaController;
-use App\Http\Controllers\Admin\CalendarioController;
-use App\Http\Controllers\Admin\SolicitudController;
+use App\Http\Controllers\PerfilController;
 use Illuminate\Support\Facades\Route;
+
 
 Route::get('/', function () {
     return redirect()->route('inicio.index');
 });
 
+
 Route::get('/inicio', [InicioController::class, 'index'])
     ->middleware(['auth', 'active'])
     ->name('inicio.index');
 
+
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Rutas del Solicitante
+|--------------------------------------------------------------------------
+*/
 
 Route::middleware(['auth', 'active'])
     ->prefix('solicitante')
     ->name('solicitante.')
     ->group(function () {
+
         Route::get('/reservas', [ReservaController::class, 'index'])
             ->name('reservas.index');
 
@@ -44,10 +63,20 @@ Route::middleware(['auth', 'active'])
             ->name('reservas.destroy');
     });
 
+
+/*
+|--------------------------------------------------------------------------
+| Rutas del Administrador
+|--------------------------------------------------------------------------
+*/
+
 Route::middleware(['auth', 'active', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
+
+        // Bandeja de solicitudes
+
         Route::get('/solicitudes', [SolicitudController::class, 'index'])
             ->name('solicitudes.index');
 
@@ -57,6 +86,9 @@ Route::middleware(['auth', 'active', 'role:admin'])
         Route::put('/solicitudes/{reserva}/rechazar', [SolicitudController::class, 'rechazar'])
             ->name('solicitudes.rechazar');
 
+
+        // Calendario maestro
+
         Route::get('/calendario', [CalendarioController::class, 'index'])
             ->name('calendario.index');
 
@@ -65,18 +97,41 @@ Route::middleware(['auth', 'active', 'role:admin'])
 
         Route::post('/calendario/bloquear', [CalendarioController::class, 'bloquear'])
             ->name('calendario.bloquear');
+
+
+        // Gestión de usuarios y bitácora
+
+        Route::get('/usuarios', [UsuarioController::class, 'index'])
+            ->name('usuarios.index');
+
+        Route::post('/usuarios', [UsuarioController::class, 'store'])
+            ->name('usuarios.store');
+
+        Route::patch('/usuarios/{usuario}/password', [UsuarioController::class, 'resetPassword'])
+            ->name('usuarios.password.reset');
+
+        Route::patch('/usuarios/{usuario}/estado', [UsuarioController::class, 'cambiarEstado'])
+            ->name('usuarios.estado');
     });
 
-Route::get('/perfil', [\App\Http\Controllers\PerfilController::class, 'edit'])
-    ->middleware(['auth', 'active'])
-    ->name('perfil.edit');
 
-Route::put('/perfil', [\App\Http\Controllers\PerfilController::class, 'updateProfile'])
-    ->middleware(['auth', 'active'])
-    ->name('perfil.update');
+/*
+|--------------------------------------------------------------------------
+| Perfil y Seguridad
+|--------------------------------------------------------------------------
+*/
 
-Route::put('/perfil/password', [\App\Http\Controllers\PerfilController::class, 'updatePassword'])
-    ->middleware(['auth', 'active'])
-    ->name('perfil.password');
+Route::middleware(['auth', 'active'])->group(function () {
+
+    Route::get('/perfil', [PerfilController::class, 'edit'])
+        ->name('perfil.edit');
+
+    Route::put('/perfil', [PerfilController::class, 'updateProfile'])
+        ->name('perfil.update');
+
+    Route::put('/perfil/password', [PerfilController::class, 'updatePassword'])
+        ->name('perfil.password');
+});
+
 
 require __DIR__ . '/auth.php';
