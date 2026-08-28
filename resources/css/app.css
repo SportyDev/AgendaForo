@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.fc .fc-button-primary {
+    background-color: #2563eb !important;
+    /* bg-blue-600 */
+    border-color: #2563eb !important;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: #1d4ed8 !important;
+    /* bg-blue-700 */
+}
+
+.fc-theme-standard td,
+.fc-theme-standard th {
+    border-color: #e2e8f0;
+    /* border-slate-200 */
+}

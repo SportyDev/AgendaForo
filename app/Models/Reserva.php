@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Reserva extends Model
 {
@@ -16,6 +16,7 @@ class Reserva extends Model
         'start_time',
         'end_time',
         'motivo',
+        'necesidades',
         'estado',
     ];
 

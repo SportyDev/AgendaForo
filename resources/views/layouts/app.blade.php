@@ -122,7 +122,7 @@
                     <a href="{{ route('inicio.index') }}"
                        class="sidebar-link group flex items-center center-on-collapse gap-4 rounded-xl px-4 py-3 text-[15px] transition-all {{ request()->routeIs('inicio.index') ? 'is-active bg-active-bg text-active-text font-bold shadow-sm' : 'text-slate-500 font-medium hover:bg-slate-50 hover:text-slate-900' }}">
                         <span class="material-symbols-rounded shrink-0 text-[22px] {{ request()->routeIs('inicio.index') ? 'filled' : 'group-hover:text-slate-700' }}">grid_view</span>
-                        <span class="hide-on-collapse whitespace-nowrap">Dashboard</span>
+                        <span class="hide-on-collapse whitespace-nowrap">Inicio</span>
                     </a>
                 </nav>
 
@@ -150,16 +150,15 @@
                 @elseif(Auth::user() && Auth::user()->role === 'solicitante')
                     <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-3 px-4 hide-on-collapse">Reservas</div>
                     <nav class="flex flex-col gap-1.5 mb-8">
-                        <a href="#"
-                           class="sidebar-link group flex items-center center-on-collapse gap-4 rounded-xl px-4 py-3 text-[15px] transition-all {{ request()->routeIs('solicitante.nueva.*') ? 'is-active bg-active-bg text-active-text font-bold shadow-sm' : 'text-slate-500 font-medium hover:bg-slate-50 hover:text-slate-900' }}">
-                            <span class="material-symbols-rounded shrink-0 text-[22px] {{ request()->routeIs('solicitante.nueva.*') ? 'filled' : 'group-hover:text-slate-700' }}">add_circle</span>
-                            <span class="hide-on-collapse whitespace-nowrap">Nueva Solicitud</span>
-                        </a>
-
-                        <a href="#"
+                        <a href="{{ route('solicitante.reservas.historial') }}"
                            class="sidebar-link group flex items-center center-on-collapse gap-4 rounded-xl px-4 py-3 text-[15px] transition-all {{ request()->routeIs('solicitante.historial.*') ? 'is-active bg-active-bg text-active-text font-bold shadow-sm' : 'text-slate-500 font-medium hover:bg-slate-50 hover:text-slate-900' }}">
                             <span class="material-symbols-rounded shrink-0 text-[22px] {{ request()->routeIs('solicitante.historial.*') ? 'filled' : 'group-hover:text-slate-700' }}">history</span>
-                            <span class="hide-on-collapse whitespace-nowrap">Mi Historial</span>
+                            <span class="hide-on-collapse whitespace-nowrap">Reservas</span>
+                        </a>
+                        <a href="{{ route('perfil.edit') }}"
+                           class="sidebar-link group flex items-center center-on-collapse gap-4 rounded-xl px-4 py-3 text-[15px] transition-all {{ request()->routeIs('solicitante.historial.*') ? 'is-active bg-active-bg text-active-text font-bold shadow-sm' : 'text-slate-500 font-medium hover:bg-slate-50 hover:text-slate-900' }}">
+                            <span class="material-symbols-rounded shrink-0 text-[22px] {{ request()->routeIs('solicitante.historial.*') ? 'filled' : 'group-hover:text-slate-700' }}">history</span>
+                            <span class="hide-on-collapse whitespace-nowrap">Perfil y Seguridad</span>
                         </a>
                     </nav>
                 @endif
@@ -170,16 +169,35 @@
                     <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white font-bold shrink-0 shadow-sm">
                         {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 1)) }}
                     </div>
-                    <div class="hide-on-collapse flex flex-col text-left overflow-hidden pl-3 pr-8 flex-1">
-                        <span class="text-[14px] font-bold text-slate-800 truncate">{{ Auth::user()->name ?? 'Usuario' }}</span>
-                        <div class="mt-1">
-                            @if(Auth::user() && Auth::user()->role === 'admin')
-                            <span class="inline-flex items-center text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md uppercase tracking-wide">Admin</span>
-                            @elseif(Auth::user() && Auth::user()->role === 'solicitante')
-                            <span class="inline-flex items-center text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md uppercase tracking-wide">Solicitante</span>
-                            @endif
-                        </div>
-                    </div>
+
+                    <div class="hide-on-collapse flex flex-col text-left overflow-hidden pl-3 pr-8 flex-1 min-w-0">
+
+    <span class="text-[14px] font-bold text-slate-800 truncate">
+        {{ Auth::user()->name ?? 'Usuario' }}
+    </span>
+
+    <span class="mt-0.5 text-[11px] font-medium text-slate-400 truncate">
+        {{ Auth::user()->email ?? 'Sin correo' }}
+    </span>
+
+    <div class="mt-1.5">
+
+        @if(Auth::user() && Auth::user()->role === 'admin')
+
+            <span class="inline-flex items-center text-[10px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded-md uppercase tracking-wide">
+                Admin
+            </span>
+
+        @elseif(Auth::user() && Auth::user()->role === 'solicitante')
+
+            <span class="inline-flex items-center text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md uppercase tracking-wide">
+                Solicitante
+            </span>
+
+        @endif
+
+    </div>
+</div>
                     <button type="button" onclick="abrirModalLogout()" class="absolute right-0 text-slate-400 hover:text-red-500 transition-colors p-2 bg-white hover:bg-red-50 rounded-xl z-10 shrink-0 hide-on-collapse" title="Cerrar Sesión">
                         <span class="material-symbols-rounded text-[20px]">logout</span>
                     </button>

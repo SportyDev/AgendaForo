@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -16,11 +15,13 @@ use Illuminate\Notifications\Notifiable;
     'password',
     'role',
     'estado',
+    'telefono',
+    'debe_cambiar_password',
+    'password_cambiado_at',
 ])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     public const ROLE_ADMIN = 'admin';
@@ -29,16 +30,13 @@ class User extends Authenticatable
     public const ESTADO_ACTIVO = 'activo';
     public const ESTADO_SUSPENDIDO = 'suspendido';
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'debe_cambiar_password' => 'boolean',
+            'password_cambiado_at' => 'datetime',
         ];
     }
 }
