@@ -11,7 +11,7 @@ class InicioController extends Controller
         $role = $request->user()->role;
 
         return match ($role) {
-            'admin' => view('dashboards.admin'),
+            'admin' => redirect()->route('admin.solicitudes.index'),
             'solicitante' => view('dashboards.solicitante'),
             default => abort(403),
         };

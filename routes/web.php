@@ -5,6 +5,8 @@ use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Solicitante\ReservaController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\SolicitudController;
+
 
 Route::get('/', function () {
     return redirect()->route('inicio.index');
@@ -30,6 +32,21 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::put('/perfil/password', [PerfilController::class, 'updatePassword'])
         ->name('perfil.password.update');
 });
+
+// Grupo protegido del administrador.
+Route::middleware(['auth', 'active', 'role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
+        Route::get('/solicitudes', [SolicitudController::class, 'index'])
+            ->name('solicitudes.index');
+
+        Route::put('/solicitudes/{reserva}/aprobar', [SolicitudController::class, 'aprobar'])
+            ->name('solicitudes.aprobar');
+
+        Route::put('/solicitudes/{reserva}/rechazar', [SolicitudController::class, 'rechazar'])
+            ->name('solicitudes.rechazar');
+    });
 
 Route::middleware(['auth', 'active'])
     ->prefix('solicitante')
