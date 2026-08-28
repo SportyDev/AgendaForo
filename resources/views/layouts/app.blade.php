@@ -359,7 +359,7 @@
 
                         <!-- Calendario Maestro -->
                         <a
-                            href="#"
+                            href="{{ route('admin.calendario.index') }}"
                             class="sidebar-link group flex items-center center-on-collapse gap-4 rounded-xl px-4 py-3 text-[15px] transition-all
                             {{ request()->routeIs('admin.calendario.*')
                                 ? 'is-active bg-active-bg text-active-text font-bold shadow-sm'
@@ -374,7 +374,7 @@
                             </span>
 
                             <span class="whitespace-nowrap hide-on-collapse">
-                                Calendario Maestro
+                                Calendario de Eventos
                             </span>
 
                         </a>
