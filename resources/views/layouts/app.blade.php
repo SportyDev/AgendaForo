@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-    <title>@yield('titulo', 'SRA')</title>
+    <title>@yield('titulo', 'AgendaForo')</title>
 
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
@@ -187,7 +187,7 @@
 
                     <div class="mt-1 flex flex-col whitespace-nowrap">
                         <h1 class="text-[20px] font-extrabold leading-none tracking-tight text-slate-900">
-                            SRA
+                            AgendaForo
                         </h1>
 
                         <p class="mt-1 text-[11px] font-medium uppercase tracking-widest text-slate-500">
@@ -556,7 +556,7 @@
                             </h3>
 
                             <p class="mt-2 text-[15px] leading-relaxed text-slate-500">
-                                ¿Estás seguro de que deseas salir del sistema SRA?
+                                ¿Estás seguro de que deseas salir del sistema AgendaForo?
                             </p>
 
                         </div>

@@ -219,8 +219,7 @@
                 </div>
             </div>
 
-            <form method="POST" action="{{ route('perfil.password.update') }}" class="space-y-5">
-                @csrf
+            <form method="POST" action="{{ route('password.update') }}" class="space-y-5">                @csrf
                 @method('PUT')
 
                 <div>

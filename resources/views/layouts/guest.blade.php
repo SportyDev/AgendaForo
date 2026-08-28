@@ -47,7 +47,7 @@
             <div>
                 <a href="/" class="flex flex-col items-center gap-4 group">
                     <div class="bg-primary flex h-20 w-20 items-center justify-center rounded-[1.25rem] text-white shadow-xl shadow-black/20 transition-transform group-hover:scale-105">
-                        <span class="material-symbols-rounded text-5xl">event_seat</span>
+                        <span class="material-symbols-rounded text-5xl">calendar_month</span>
                     </div>
                     <div class="text-center">
                         <h1 class="text-4xl font-extrabold tracking-tight leading-tight text-slate-900">AgendaForo</h1>
