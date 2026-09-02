@@ -17,7 +17,6 @@ class Reserva extends Model
         'end_time',
         'motivo',
         'necesidades',
-        'nota_admin',
         'estado',
     ];
 
