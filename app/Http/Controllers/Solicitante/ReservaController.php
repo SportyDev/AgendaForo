@@ -18,7 +18,19 @@ class ReservaController extends Controller
     // Margen exclusivo después del evento (1 hora = 60 minutos)
     private const BUFFER_AFTER_MINUTES = 60;
 
-    public function index(): View
+    /**
+     * Compatibilidad con la ruta anterior /solicitante/reservas.
+     * El calendario ahora vive en /solicitante/calendario.
+     */
+    public function index(): RedirectResponse
+    {
+        return redirect()->route('solicitante.calendario.index');
+    }
+
+    /**
+     * Pantalla principal del calendario para el solicitante.
+     */
+    public function calendario(): View
     {
         return view('dashboards.solicitante');
     }

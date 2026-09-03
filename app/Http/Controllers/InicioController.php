@@ -12,7 +12,7 @@ class InicioController extends Controller
 
         return match ($role) {
             'admin' => redirect()->route('admin.solicitudes.index'),
-            'solicitante' => view('dashboards.solicitante'),
+            'solicitante' => redirect()->route('solicitante.reservas.historial'),
             default => abort(403),
         };
     }

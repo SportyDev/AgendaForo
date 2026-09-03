@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('titulo', 'SRA - Mis Reservas')
-@section('titulo_pagina', 'Mis Reservas')
-@section('subtitulo_pagina', 'Consulta, edita o cancela tus solicitudes de reserva.')
+{{-- @section('titulo_pagina', 'Mis Reservas')
+@section('subtitulo_pagina', 'Consulta, edita o cancela tus solicitudes de reserva.') --}}
 
 @section('contenido')
 
@@ -115,14 +115,41 @@
         </div>
     @endif
 
+    <div class="mb-6 overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-slate-950 via-slate-900 to-blue-900 p-6 text-white shadow-xl shadow-slate-900/10 sm:p-8">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div class="max-w-3xl">
+                <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-blue-100">
+                    <span class="material-symbols-rounded text-[18px]">waving_hand</span>
+                    Bienvenido
+                </div>
+
+                <h2 class="text-xl font-bold leading-tight sm:text-2xl">
+                    Bienvenido al sistema de reservas de auditorio del Centro Nacional de Innovación Educativa y Desarrollo Docente del TecNM
+                </h2>
+
+                <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+                    Consulta tus solicitudes, revisa su estado y gestiona tus próximas reservas desde un mismo lugar.
+                </p>
+            </div>
+
+            <a
+                href="{{ route('solicitante.calendario.index') }}"
+                class="inline-flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-slate-900 shadow-lg transition hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-white/40"
+            >
+                <span class="material-symbols-rounded text-[20px]">add_circle</span>
+                Registrar reserva
+            </a>
+        </div>
+    </div>
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200">
                 <thead class="bg-slate-50">
                     <tr>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Fecha del Evento</th>
-                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Horario</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Fecha y Horario</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Título del Evento</th>
                         <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Motivo</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Requerimientos</th>
                         <th scope="col" class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-500">Estado</th>
                         <th scope="col" class="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-slate-500">Acciones</th>
                     </tr>
@@ -136,23 +163,38 @@
                                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                                         <span class="material-symbols-rounded text-[21px]">calendar_month</span>
                                     </div>
-                                    <p class="text-sm font-semibold text-slate-900">
-                                        {{ $reserva->start_time->translatedFormat('d \\d\\e F \\d\\e Y') }}
-                                    </p>
-                                </div>
-                            </td>
-
-                            <td class="whitespace-nowrap px-6 py-5">
-                                <div class="flex items-center gap-2 text-sm text-slate-700">
-                                    <span class="material-symbols-rounded text-[19px] text-slate-400">schedule</span>
-                                    <span>{{ $reserva->start_time->format('H:i') }} - {{ $reserva->end_time->format('H:i') }}</span>
+                                    <div>
+                                        <p class="text-sm font-semibold text-slate-900">
+                                            {{ $reserva->start_time->translatedFormat('d \\d\\e F \\d\\e Y') }}
+                                        </p>
+                                        <div class="mt-1 flex items-center gap-2 text-xs font-medium text-slate-500">
+                                            <span class="material-symbols-rounded text-[16px]">schedule</span>
+                                            <span>{{ $reserva->start_time->format('H:i') }} - {{ $reserva->end_time->format('H:i') }}</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </td>
 
                             <td class="max-w-xs px-6 py-5">
-                                <p class="truncate text-sm font-medium text-slate-700" title="{{ $reserva->motivo }}">
+                                <p class="text-sm font-semibold text-slate-900" title="{{ $reserva->nombre_evento }}">
+                                    {{ \Illuminate\Support\Str::limit($reserva->nombre_evento ?? 'Sin título', 70) }}
+                                </p>
+                            </td>
+
+                            <td class="max-w-xs px-6 py-5">
+                                <p class="text-sm font-medium text-slate-700" title="{{ $reserva->motivo }}">
                                     {{ \Illuminate\Support\Str::limit($reserva->motivo, 70) }}
                                 </p>
+                            </td>
+
+                            <td class="max-w-xs px-6 py-5">
+                                @if(filled($reserva->necesidades))
+                                    <p class="text-sm text-slate-600" title="{{ $reserva->necesidades }}">
+                                        {{ \Illuminate\Support\Str::limit($reserva->necesidades, 70) }}
+                                    </p>
+                                @else
+                                    <span class="text-sm text-slate-400">Sin requerimientos</span>
+                                @endif
                             </td>
 
                             <td class="whitespace-nowrap px-6 py-5">
@@ -186,7 +228,7 @@
                             <td class="whitespace-nowrap px-6 py-5 text-right">
                                 <div class="flex items-center justify-end gap-2">
                                     @if((int) $reserva->estado === \App\Models\Reserva::ESTADO_PENDIENTE)
-                                        <button type="button" onclick="abrirEditarReserva(@js($reserva->id), @js($reserva->start_time->format('Y-m-d')), @js($reserva->start_time->format('H:i')), @js($reserva->end_time->format('H:i')), @js($reserva->motivo))" class="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 transition hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500/30" title="Editar solicitud">
+                                        <button type="button" onclick="abrirEditarReserva(@js($reserva->id), @js($reserva->start_time->format('Y-m-d')), @js($reserva->start_time->format('H:i')), @js($reserva->end_time->format('H:i')), @js($reserva->nombre_evento ?? ''), @js($reserva->motivo), @js($reserva->necesidades ?? ''))" class="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 transition hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500/30" title="Editar solicitud">
                                             <span class="material-symbols-rounded text-[18px]">edit</span>
                                             Editar
                                         </button>
@@ -219,7 +261,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-16">
+                            <td colspan="6" class="px-6 py-16">
                                 <div class="flex flex-col items-center justify-center text-center">
                                     <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
                                         <span class="material-symbols-rounded text-[34px]">event_busy</span>
@@ -282,9 +324,21 @@
                     </div>
 
                     <div>
+                        <label for="edit_nombre_evento" class="mb-2 block text-sm font-semibold text-slate-700">Nombre del Evento</label>
+                        <input type="text" id="edit_nombre_evento" name="nombre_evento" maxlength="150" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                        <div class="mt-2 text-right text-xs text-slate-400">Máximo 150 caracteres</div>
+                    </div>
+
+                    <div>
                         <label for="edit_motivo" class="mb-2 block text-sm font-semibold text-slate-700">Motivo del evento</label>
                         <textarea id="edit_motivo" name="motivo" rows="4" maxlength="500" required class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"></textarea>
                         <div class="mt-2 text-right text-xs text-slate-400">Máximo 500 caracteres</div>
+                    </div>
+
+                    <div>
+                        <label for="edit_necesidades" class="mb-2 block text-sm font-semibold text-slate-700">Necesidades</label>
+                        <textarea id="edit_necesidades" name="necesidades" rows="3" maxlength="1000" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20" placeholder="Describe equipo, mobiliario, apoyo técnico u otros requerimientos."></textarea>
+                        <div class="mt-2 text-right text-xs text-slate-400">Máximo 1000 caracteres</div>
                     </div>
 
                     <div class="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
@@ -356,12 +410,14 @@
             const btnCerrarEditar = document.getElementById('btnCerrarEditarReserva');
             const btnCancelarEditar = document.getElementById('btnCancelarEditarReserva');
 
-            window.abrirEditarReserva = function (id, fecha, inicio, fin, motivo) {
+            window.abrirEditarReserva = function (id, fecha, inicio, fin, nombreEvento, motivo, necesidades) {
                 formEditar.action = "{{ url('/solicitante/reservas') }}/" + id;
                 document.getElementById('edit_fecha').value = fecha;
                 document.getElementById('edit_start_time').value = inicio;
                 document.getElementById('edit_end_time').value = fin;
-                document.getElementById('edit_motivo').value = motivo;
+                document.getElementById('edit_nombre_evento').value = nombreEvento || '';
+                document.getElementById('edit_motivo').value = motivo || '';
+                document.getElementById('edit_necesidades').value = necesidades || '';
                 modalEditar.classList.remove('hidden');
                 document.body.classList.add('overflow-hidden');
                 setTimeout(() => document.getElementById('edit_fecha').focus(), 50);

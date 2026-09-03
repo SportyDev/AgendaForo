@@ -37,8 +37,6 @@
                         "surface-light": "#ffffff",
                         "text-main": "#0f172a",
                         "text-muted": "#64748b",
-                        "active-bg": "#2563EB",
-                        "active-text": "#ffffff",
                     },
                     fontFamily: {
                         "display": ["Inter", "sans-serif"]
@@ -77,8 +75,7 @@
         }
 
         body:not(.preload) #sidebar,
-        body:not(.preload) #main-content,
-        body:not(.preload) #top-header {
+        body:not(.preload) #main-content {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -90,22 +87,12 @@
             margin-left: var(--sidebar-w);
         }
 
-        #top-header {
-            left: var(--sidebar-w);
-            width: calc(100% - var(--sidebar-w));
-        }
-
         html[data-sidebar="closed"] #sidebar {
             width: var(--sidebar-collapsed-w);
         }
 
         html[data-sidebar="closed"] #main-content {
             margin-left: var(--sidebar-collapsed-w);
-        }
-
-        html[data-sidebar="closed"] #top-header {
-            left: var(--sidebar-collapsed-w);
-            width: calc(100% - var(--sidebar-collapsed-w));
         }
 
         html[data-sidebar="closed"] .hide-on-collapse {
@@ -179,9 +166,10 @@
 
                 <div class="flex items-center gap-3 pl-2 hide-on-collapse">
 
-                    <div class="flex items-center justify-center text-primary">
-                        <span class="material-symbols-rounded text-[32px] filled">
-                            calendar_month
+                    <!-- Ícono de Logo Modernizado con Gradiente -->
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-slate-950 via-slate-900 to-blue-900 text-white shadow-md shadow-blue-900/20">
+                        <span class="material-symbols-rounded text-[24px] filled">
+                            view_agenda
                         </span>
                     </div>
 
@@ -230,10 +218,6 @@
                 class="flex-1 overflow-y-auto scrollbar-hide -mx-2 px-2"
             >
 
-                {{-- =====================================================
-                     SOLICITANTE
-                     ===================================================== --}}
-
                 @if(Auth::user() && Auth::user()->role === 'solicitante')
 
                     <!-- General -->
@@ -243,70 +227,66 @@
 
                     <nav class="mb-8 flex flex-col gap-1.5">
 
+                        <!-- Inicio (Historial de Reservas) -->
+                        <!-- Inicio (Historial de Reservas) -->
                         <a
                             href="{{ route('inicio.index') }}"
                             class="sidebar-link group flex items-center center-on-collapse gap-4 rounded-xl px-4 py-3 text-[15px] transition-all
-                            {{ request()->routeIs('inicio.index')
-                                ? 'is-active bg-active-bg text-active-text font-bold shadow-sm'
+                            {{ request()->routeIs('inicio.index', 'solicitante.reservas.*')
+                                ? 'is-active bg-gradient-to-br from-slate-950 via-slate-900 to-blue-900 text-white font-bold shadow-md shadow-blue-900/20'
                                 : 'font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}"
                         >
-
                             <span
                                 class="material-symbols-rounded shrink-0 text-[22px]
-                                {{ request()->routeIs('inicio.index') ? 'filled' : 'group-hover:text-slate-700' }}"
+                                {{ request()->routeIs('inicio.index', 'solicitante.reservas.*') ? 'text-white filled' : 'text-slate-400 group-hover:text-slate-700' }}"
                             >
-                                grid_view
+                                space_dashboard
                             </span>
 
                             <span class="whitespace-nowrap hide-on-collapse">
                                 Inicio
                             </span>
+                        </a>
 
+                        <!-- Calendario (Nueva Reserva) -->
+                        <a
+                            href="{{ route('solicitante.calendario.index') }}"
+                            class="sidebar-link group flex items-center center-on-collapse gap-4 rounded-xl px-4 py-3 text-[15px] transition-all
+                            {{ request()->routeIs('solicitante.calendario.*')
+                                ? 'is-active bg-gradient-to-br from-slate-950 via-slate-900 to-blue-900 text-white font-bold shadow-md shadow-blue-900/20'
+                                : 'font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}"
+                        >
+                            <span
+                                class="material-symbols-rounded shrink-0 text-[22px]
+                                {{ request()->routeIs('solicitante.calendario.*') ? 'text-white filled' : 'text-slate-400 group-hover:text-slate-700' }}"
+                            >
+                                event_upcoming
+                            </span>
+
+                            <span class="whitespace-nowrap hide-on-collapse">
+                                Nuevo Evento
+                            </span>
                         </a>
 
                     </nav>
 
-
-                    <!-- Reservas -->
+                    <!-- Cuenta -->
                     <div class="mb-3 px-4 text-[11px] font-bold uppercase tracking-wider text-slate-400 hide-on-collapse">
-                        Reservas
+                        Cuenta
                     </div>
 
                     <nav class="mb-8 flex flex-col gap-1.5">
 
                         <a
-                            href="{{ route('solicitante.reservas.historial') }}"
-                            class="sidebar-link group flex items-center center-on-collapse gap-4 rounded-xl px-4 py-3 text-[15px] transition-all
-                            {{ request()->routeIs('solicitante.reservas.*')
-                                ? 'is-active bg-active-bg text-active-text font-bold shadow-sm'
-                                : 'font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}"
-                        >
-
-                            <span
-                                class="material-symbols-rounded shrink-0 text-[22px]
-                                {{ request()->routeIs('solicitante.reservas.*') ? 'filled' : 'group-hover:text-slate-700' }}"
-                            >
-                                history
-                            </span>
-
-                            <span class="whitespace-nowrap hide-on-collapse">
-                                Reservas
-                            </span>
-
-                        </a>
-
-
-                        <a
                             href="{{ route('perfil.edit') }}"
                             class="sidebar-link group flex items-center center-on-collapse gap-4 rounded-xl px-4 py-3 text-[15px] transition-all
                             {{ request()->routeIs('perfil.*')
-                                ? 'is-active bg-active-bg text-active-text font-bold shadow-sm'
+                                ? 'is-active bg-gradient-to-br from-slate-950 via-slate-900 to-blue-900 text-white font-bold shadow-md shadow-blue-900/20'
                                 : 'font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}"
                         >
-
                             <span
                                 class="material-symbols-rounded shrink-0 text-[22px]
-                                {{ request()->routeIs('perfil.*') ? 'filled' : 'group-hover:text-slate-700' }}"
+                                {{ request()->routeIs('perfil.*') ? 'text-white filled' : 'text-slate-400 group-hover:text-slate-700' }}"
                             >
                                 security
                             </span>
@@ -314,17 +294,11 @@
                             <span class="whitespace-nowrap hide-on-collapse">
                                 Perfil y Seguridad
                             </span>
-
                         </a>
 
                     </nav>
 
                 @endif
-
-
-                {{-- =====================================================
-                     ADMINISTRADOR
-                     ===================================================== --}}
 
                 @if(Auth::user() && Auth::user()->role === 'admin')
 
@@ -339,13 +313,12 @@
                             href="{{ route('admin.solicitudes.index') }}"
                             class="sidebar-link group flex items-center center-on-collapse gap-4 rounded-xl px-4 py-3 text-[15px] transition-all
                             {{ request()->routeIs('admin.solicitudes.*')
-                                ? 'is-active bg-active-bg text-active-text font-bold shadow-sm'
+                                ? 'is-active bg-gradient-to-br from-slate-950 via-slate-900 to-blue-900 text-white font-bold shadow-md shadow-blue-900/20'
                                 : 'font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}"
                         >
-
                             <span
                                 class="material-symbols-rounded shrink-0 text-[22px]
-                                {{ request()->routeIs('admin.solicitudes.*') ? 'filled' : 'group-hover:text-slate-700' }}"
+                                {{ request()->routeIs('admin.solicitudes.*') ? 'text-white filled' : 'text-slate-400 group-hover:text-slate-700' }}"
                             >
                                 inbox
                             </span>
@@ -353,7 +326,6 @@
                             <span class="whitespace-nowrap hide-on-collapse">
                                 Bandeja de solicitudes
                             </span>
-
                         </a>
 
 
@@ -362,13 +334,12 @@
                             href="{{ route('admin.calendario.index') }}"
                             class="sidebar-link group flex items-center center-on-collapse gap-4 rounded-xl px-4 py-3 text-[15px] transition-all
                             {{ request()->routeIs('admin.calendario.*')
-                                ? 'is-active bg-active-bg text-active-text font-bold shadow-sm'
+                                ? 'is-active bg-gradient-to-br from-slate-950 via-slate-900 to-blue-900 text-white font-bold shadow-md shadow-blue-900/20'
                                 : 'font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}"
                         >
-
                             <span
                                 class="material-symbols-rounded shrink-0 text-[22px]
-                                {{ request()->routeIs('admin.calendario.*') ? 'filled' : 'group-hover:text-slate-700' }}"
+                                {{ request()->routeIs('admin.calendario.*') ? 'text-white filled' : 'text-slate-400 group-hover:text-slate-700' }}"
                             >
                                 calendar_month
                             </span>
@@ -376,7 +347,6 @@
                             <span class="whitespace-nowrap hide-on-collapse">
                                 Calendario de Eventos
                             </span>
-
                         </a>
 
 
@@ -385,13 +355,12 @@
                             href="{{ route('admin.usuarios.index') }}"
                             class="sidebar-link group flex items-center center-on-collapse gap-4 rounded-xl px-4 py-3 text-[15px] transition-all
                             {{ request()->routeIs('admin.usuarios.*')
-                                ? 'is-active bg-active-bg text-active-text font-bold shadow-sm'
+                                ? 'is-active bg-gradient-to-br from-slate-950 via-slate-900 to-blue-900 text-white font-bold shadow-md shadow-blue-900/20'
                                 : 'font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}"
                         >
-
                             <span
                                 class="material-symbols-rounded shrink-0 text-[22px]
-                                {{ request()->routeIs('admin.usuarios.*') ? 'filled' : 'group-hover:text-slate-700' }}"
+                                {{ request()->routeIs('admin.usuarios.*') ? 'text-white filled' : 'text-slate-400 group-hover:text-slate-700' }}"
                             >
                                 manage_accounts
                             </span>
@@ -399,7 +368,6 @@
                             <span class="whitespace-nowrap hide-on-collapse">
                                 Gestión de Usuarios
                             </span>
-
                         </a>
 
                     </nav>
@@ -417,7 +385,6 @@
                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-900 font-bold text-white shadow-sm">
                         {{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 1)) }}
                     </div>
-
 
                     <div class="min-w-0 flex-1 overflow-hidden pl-3 pr-8 text-left hide-on-collapse">
 
@@ -449,7 +416,6 @@
 
                     </div>
 
-
                     <button
                         type="button"
                         onclick="abrirModalLogout()"
@@ -473,48 +439,19 @@
     <!-- Contenido principal -->
     <div class="flex h-screen w-full flex-col">
 
-        <header
-            id="top-header"
-            class="fixed top-0 z-40 flex h-[76px] items-center justify-between bg-surface-light px-6 py-4 shadow-[0_1px_2px_0_rgba(0,0,0,0.02)] sm:px-10"
-        >
-
-            <div class="flex items-center gap-4">
-
-                <button
-                    type="button"
-                    onclick="toggleMobileSidebar()"
-                    class="flex items-center justify-center rounded-md p-2 text-slate-500 transition-colors hover:bg-slate-50 hover:text-primary lg:hidden"
-                >
-                    <span class="material-symbols-rounded">
-                        menu
-                    </span>
-                </button>
-
-                <div>
-
-                    <h2 class="text-xl font-bold leading-none text-slate-900 sm:text-[24px]">
-                        @yield('titulo_pagina', 'Dashboard')
-                    </h2>
-
-                    <p class="mt-1 hidden text-[14px] text-slate-500 sm:block">
-                        @yield('subtitulo_pagina')
-                    </p>
-
-                </div>
-
-            </div>
-
-            <div class="flex items-center gap-4">
-                @yield('acciones_cabecera')
-            </div>
-
-        </header>
-
-
         <main
             id="main-content"
-            class="mt-[76px] h-full flex-1 overflow-y-auto bg-background-light p-6 sm:p-10"
+            class="relative h-full flex-1 overflow-y-auto bg-background-light p-6 sm:p-10"
         >
+            <button
+                type="button"
+                onclick="toggleMobileSidebar()"
+                class="fixed left-4 top-4 z-30 flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50 hover:text-primary lg:hidden"
+                aria-label="Abrir menú"
+            >
+                <span class="material-symbols-rounded text-[22px]">menu</span>
+            </button>
+
             @yield('contenido')
         </main>
 

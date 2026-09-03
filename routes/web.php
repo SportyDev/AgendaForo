@@ -44,11 +44,16 @@ Route::middleware(['auth', 'active'])
     ->name('solicitante.')
     ->group(function () {
 
+        // Calendario del solicitante
+        Route::get('/calendario', [ReservaController::class, 'calendario'])
+            ->name('calendario.index');
+
+        Route::get('/calendario/eventos', [ReservaController::class, 'getEventos'])
+            ->name('calendario.eventos');
+
+        // Compatibilidad con la URL anterior del calendario.
         Route::get('/reservas', [ReservaController::class, 'index'])
             ->name('reservas.index');
-
-        Route::get('/reservas/eventos', [ReservaController::class, 'getEventos'])
-            ->name('reservas.eventos');
 
         Route::post('/reservas', [ReservaController::class, 'store'])
             ->name('reservas.store');

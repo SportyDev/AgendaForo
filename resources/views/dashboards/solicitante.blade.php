@@ -497,7 +497,7 @@
                 displayEventTime: true,
                 
                 events: {
-                    url: @json(route('solicitante.reservas.eventos')),
+                    url: @json(route('solicitante.calendario.eventos')),
                     method: 'GET'
                 },
 
