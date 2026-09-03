@@ -15,6 +15,7 @@ return new class extends Migration
                 ->restrictOnDelete();
             $table->dateTime('start_time');
             $table->dateTime('end_time');
+            $table->string('nombre_evento', 150);
             $table->text('motivo');
             $table->text('necesidades')->nullable();
             $table->tinyInteger('estado')->default(1);

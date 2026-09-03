@@ -15,6 +15,7 @@ class Reserva extends Model
         'user_id',
         'start_time',
         'end_time',
+        'nombre_evento',
         'motivo',
         'necesidades',
         'estado',
