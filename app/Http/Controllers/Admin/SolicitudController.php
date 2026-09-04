@@ -14,8 +14,7 @@ class SolicitudController extends Controller
 {
     public function __construct(
         private readonly AuditLogger $auditLogger,
-    ) {
-    }
+    ) {}
 
     public function index(): View
     {
@@ -25,7 +24,36 @@ class SolicitudController extends Controller
             ->orderBy('start_time')
             ->paginate(10);
 
-        return view('dashboards.admin', compact('reservas'));
+        $proximosEventos = Reserva::query()
+            ->where('estado', Reserva::ESTADO_APROBADA)
+            ->where('start_time', '>=', now()->startOfDay())
+            ->orderBy('start_time')
+            ->limit(6)
+            ->get();
+
+        return view('dashboards.admin', compact('reservas', 'proximosEventos'));
+    }
+
+    public function historial(Request $request): View
+    {
+        $reservas = Reserva::query()
+            ->with('user')
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = trim((string) $request->input('search'));
+                $query->where(function ($q) use ($search) {
+                    $q->where('nombre_evento', 'like', "%{$search}%")
+                        ->orWhere('motivo', 'like', "%{$search}%")
+                        ->orWhereHas('user', fn($userQ) => $userQ->where('name', 'like', "%{$search}%"));
+                });
+            })
+            ->when($request->filled('estado') && $request->input('estado') !== 'todos', function ($query) use ($request) {
+                $query->where('estado', $request->input('estado'));
+            })
+            ->orderByDesc('start_time')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('admin.historial', compact('reservas'));
     }
 
     public function aprobar(Request $request, Reserva $reserva): RedirectResponse
@@ -63,11 +91,7 @@ class SolicitudController extends Controller
     public function rechazar(Request $request, Reserva $reserva): RedirectResponse
     {
         $datos = $request->validate([
-            'nota_admin' => [
-                'required',
-                'string',
-                'max:500',
-            ],
+            'nota_admin' => ['required', 'string', 'max:500'],
         ], [
             'nota_admin.required' => 'Debes indicar el motivo del rechazo.',
             'nota_admin.max' => 'El motivo del rechazo no puede superar los 500 caracteres.',

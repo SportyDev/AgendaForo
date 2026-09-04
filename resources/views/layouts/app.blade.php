@@ -269,6 +269,7 @@
                         </a>
 
                     </nav>
+                    
 
                     <!-- Cuenta -->
                     <div class="mb-3 px-4 text-[11px] font-bold uppercase tracking-wider text-slate-400 hide-on-collapse">
@@ -347,6 +348,12 @@
                             <span class="whitespace-nowrap hide-on-collapse">
                                 Calendario de Eventos
                             </span>
+                        </a>
+
+                        <!-- Historial (Nuevo) -->
+                        <a href="{{ route('admin.historial.index') }}" class="sidebar-link group flex items-center center-on-collapse gap-4 rounded-xl px-4 py-3 text-[15px] transition-all {{ request()->routeIs('admin.historial.*') ? 'is-active bg-gradient-to-br from-slate-950 via-slate-900 to-blue-900 text-white font-bold shadow-md shadow-blue-900/20' : 'font-medium text-slate-500 hover:bg-slate-50 hover:text-slate-900' }}">
+                            <span class="material-symbols-rounded shrink-0 text-[22px] {{ request()->routeIs('admin.historial.*') ? 'text-white filled' : 'text-slate-400 group-hover:text-slate-700' }}">history</span>
+                            <span class="whitespace-nowrap hide-on-collapse">Historial</span>
                         </a>
 
 

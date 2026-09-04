@@ -16,18 +16,18 @@ use Illuminate\View\View;
 
 class CalendarioController extends Controller
 {
+    // Margen exclusivo después del evento (1 hora = 60 minutos)
+    private const BUFFER_AFTER_MINUTES = 60;
+
     public function __construct(
         private readonly AuditLogger $auditLogger,
-    ) {
-    }
+    ) {}
 
-    // Calendario global del administrador.
     public function index(): View
     {
         return view('admin.calendario');
     }
 
-    // Devuelve todas las reservas pendientes y aprobadas.
     public function getEventos(): JsonResponse
     {
         $reservas = Reserva::query()
@@ -39,83 +39,88 @@ class CalendarioController extends Controller
             ->orderBy('start_time')
             ->get();
 
-        $eventos = $reservas->map(function (Reserva $reserva): array {
+        $eventos = [];
+
+        foreach ($reservas as $reserva) {
             $estado = match ($reserva->estado) {
                 Reserva::ESTADO_APROBADA => 'Aprobada',
                 Reserva::ESTADO_PENDIENTE => 'Pendiente',
                 default => 'Reserva',
             };
 
-            return [
+            $color = $reserva->estado === Reserva::ESTADO_APROBADA ? '#2563EB' : '#F59E0B';
+            $start = $reserva->start_time;
+            $end = $reserva->end_time;
+
+            // Evento Principal (Formato Local sin la 'Z' de UTC)
+            $eventos[] = [
                 'id' => $reserva->id,
-                'title' => $estado . ' - ' . ($reserva->user?->name ?? 'Usuario'),
-                'start' => $reserva->start_time->toIso8601String(),
-                'end' => $reserva->end_time->toIso8601String(),
-                'color' => $reserva->estado === Reserva::ESTADO_APROBADA
-                    ? '#2563EB'
-                    : '#F59E0B',
+                'title' => $estado . ' - ' . ($reserva->nombre_evento ?: 'Bloqueo/Evento'),
+                'start' => $start->format('Y-m-d\TH:i:s'),
+                'end' => $end->format('Y-m-d\TH:i:s'),
+                'color' => $color,
                 'textColor' => '#FFFFFF',
             ];
-        })->values();
+
+            // Margen de Limpieza de 1 Hora visible en el calendario
+            $bufferFin = $end->copy()->addMinutes(self::BUFFER_AFTER_MINUTES);
+            $eventos[] = [
+                'id' => 'buffer-after-' . $reserva->id,
+                'title' => 'Margen / Limpieza',
+                'start' => $end->format('Y-m-d\TH:i:s'),
+                'end' => $bufferFin->format('Y-m-d\TH:i:s'),
+                'display' => 'background',
+                'backgroundColor' => '#cbd5e1',
+                'borderColor' => '#cbd5e1',
+            ];
+        }
 
         return response()->json($eventos);
     }
 
-    // Registra un bloqueo manual como una reserva aprobada.
     public function bloquear(Request $request): RedirectResponse
     {
         $datos = $request->validate([
+            'nombre_evento' => ['required', 'string', 'max:150'],
             'fecha' => ['required', 'date'],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
             'motivo' => ['required', 'string', 'max:500'],
         ], [
+            'nombre_evento.required' => 'Asigna un título al bloqueo.',
             'fecha.required' => 'Selecciona una fecha.',
             'start_time.required' => 'Selecciona la hora de inicio.',
             'end_time.required' => 'Selecciona la hora de término.',
             'end_time.after' => 'La hora de término debe ser posterior a la hora de inicio.',
             'motivo.required' => 'Escribe el motivo del bloqueo.',
-            'motivo.max' => 'El motivo no puede superar los 500 caracteres.',
         ]);
 
         $fecha = Carbon::parse($datos['fecha']);
+        $startTime = Carbon::createFromFormat('Y-m-d H:i', $fecha->format('Y-m-d') . ' ' . $datos['start_time']);
+        $endTime = Carbon::createFromFormat('Y-m-d H:i', $fecha->format('Y-m-d') . ' ' . $datos['end_time']);
 
-        $startTime = Carbon::createFromFormat(
-            'Y-m-d H:i',
-            $fecha->format('Y-m-d') . ' ' . $datos['start_time']
-        );
-
-        $endTime = Carbon::createFromFormat(
-            'Y-m-d H:i',
-            $fecha->format('Y-m-d') . ' ' . $datos['end_time']
-        );
+        // Se respeta la regla de limpieza del solicitante para detectar choques (+ 60 mins)
+        $nuevoFinConLimpieza = $endTime->copy()->addMinutes(self::BUFFER_AFTER_MINUTES);
 
         $hayConflicto = Reserva::query()
-            ->whereIn('estado', [
-                Reserva::ESTADO_PENDIENTE,
-                Reserva::ESTADO_APROBADA,
-            ])
-            ->where(function ($query) use ($startTime, $endTime): void {
+            ->whereIn('estado', [Reserva::ESTADO_PENDIENTE, Reserva::ESTADO_APROBADA])
+            ->where(function ($query) use ($startTime, $nuevoFinConLimpieza): void {
                 $query
-                    ->where('start_time', '<', $endTime)
-                    ->where('end_time', '>', $startTime);
+                    ->where('start_time', '<', $nuevoFinConLimpieza)
+                    ->where('end_time', '>', $startTime->copy()->subMinutes(self::BUFFER_AFTER_MINUTES));
             })
             ->exists();
 
         if ($hayConflicto) {
             throw ValidationException::withMessages([
-                'fecha' => 'El horario seleccionado ya está ocupado. Elige otra fecha u horario.',
+                'fecha' => 'El horario seleccionado choca con un evento o su margen de limpieza.',
             ]);
         }
 
-        $reserva = DB::transaction(function () use (
-            $request,
-            $datos,
-            $startTime,
-            $endTime
-        ): Reserva {
+        $reserva = DB::transaction(function () use ($request, $datos, $startTime, $endTime): Reserva {
             $reserva = Reserva::create([
                 'user_id' => Auth::id(),
+                'nombre_evento' => $datos['nombre_evento'],
                 'start_time' => $startTime,
                 'end_time' => $endTime,
                 'motivo' => $datos['motivo'],
@@ -126,24 +131,14 @@ class CalendarioController extends Controller
                 request: $request,
                 accion: 'bloqueo_manual_calendario',
                 modulo: 'Calendario',
-                descripcion: "Registró un bloqueo manual para {$startTime->format('d/m/Y H:i')} a {$endTime->format('H:i')}.",
+                descripcion: "Registró un bloqueo manual para {$startTime->format('d/m/Y H:i')}.",
                 nivel: 'importante',
                 sujeto: $reserva,
-                valoresNuevos: [
-                    'reserva_id' => $reserva->id,
-                    'start_time' => $startTime->toDateTimeString(),
-                    'end_time' => $endTime->toDateTimeString(),
-                    'motivo' => $datos['motivo'],
-                    'estado' => Reserva::ESTADO_APROBADA,
-                ],
             );
 
             return $reserva;
         });
 
-        return back()->with(
-            'success',
-            'El bloqueo manual se registró correctamente en el calendario.'
-        );
+        return back()->with('success', 'El bloqueo manual se registró correctamente en el calendario.');
     }
 }
