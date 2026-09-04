@@ -50,11 +50,15 @@ Route::middleware(['auth', 'active', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        // Bandeja y Nuevo Historial
+        // Bandeja de solicitudes
         Route::get('/solicitudes', [SolicitudController::class, 'index'])->name('solicitudes.index');
-        Route::get('/historial', [SolicitudController::class, 'historial'])->name('historial.index');
         Route::put('/solicitudes/{reserva}/aprobar', [SolicitudController::class, 'aprobar'])->name('solicitudes.aprobar');
         Route::put('/solicitudes/{reserva}/rechazar', [SolicitudController::class, 'rechazar'])->name('solicitudes.rechazar');
+
+        // Historial General (Edición y Cancelación de Eventos)
+        Route::get('/historial', [SolicitudController::class, 'historial'])->name('historial.index');
+        Route::put('/historial/{reserva}', [SolicitudController::class, 'update'])->name('historial.update');
+        Route::delete('/historial/{reserva}', [SolicitudController::class, 'destroy'])->name('historial.destroy');
 
         // Calendario maestro
         Route::get('/calendario', [CalendarioController::class, 'index'])->name('calendario.index');
